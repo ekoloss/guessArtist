@@ -1,0 +1,57 @@
+version: '3.7'
+services:
+  postgres:
+    container_name: '${COMPOSE_PROJECT_NAME}_postgres_dev'
+    image: 'postgres:15.0-alpine'
+    volumes:
+      - 'guess_artistPostgresVolumeDev:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+    env_file:
+      - ./server/.env.dev
+  redis:
+    image: 'redis:7.0.5-alpine'
+    container_name: '${COMPOSE_PROJECT_NAME}_redis_dev'
+    environment: []
+    volumes:
+      - 'guess_artistRedisVolumeDev:/data'
+    ports:
+      - '6379:6379'
+  server:
+    container_name: '${COMPOSE_PROJECT_NAME}_server_dev'
+    image: '${COMPOSE_PROJECT_NAME}_server_dev'
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: development
+    volumes:
+      - './server:/usr/src/app/server'
+      - './models:/usr/src/app/models'
+    ports:
+      - '${SERVER_PORT}:${SERVER_PORT}'
+    env_file:
+      - .env.dev
+      - ./server/.env.dev
+    command: 'npm run start:dev --prefix /usr/src/app/server'
+    depends_on:
+      - postgres
+      - redis
+  client:
+    container_name: '${COMPOSE_PROJECT_NAME}_client_dev'
+    image: '${COMPOSE_PROJECT_NAME}_client_dev'
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      target: development
+    volumes:
+      - './client:/usr/src/app/client'
+      - './models:/usr/src/app/models'
+    ports:
+      - '${CLIENT_PORT}:${CLIENT_PORT}'
+    env_file:
+      - .env.dev
+      - ./client/.env.dev
+    command: npm run start --prefix /usr/src/app/client
+volumes:
+  guess_artistPostgresVolumeDev: null
+  guess_artistRedisVolumeDev: null

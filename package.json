@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "migrate:db:prod": "docker exec -it guess_artist_server_prod sh -c  \"cd /usr/src/app/server && ./node_modules/.bin/knex migrate:latest\"",
+    "migrate:db": "docker exec -it guess_artist_server_prod sh -c  \"cd /usr/src/app/server && ./node_modules/.bin/knex migrate:latest\"",
+
+    "start": "docker compose --env-file=.env.dev up",
+    "build": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod build",
+    "start:prod": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod up -d",
+    "upgrade:prod": "npm run clean:client_container; npm run clean:server_container; npm run start:prod",
+
+    "start:client": "docker compose --env-file=.env.dev up client",
+    "clean:client_container": "docker container stop guess_artist_client_prod; docker container rm guess_artist_client_prod",
+    "build:client": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod build client",
+    "start:client:prod": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod up -d client",
+
+    "start:server": "docker compose --env-file=.env.dev up server",
+    "clean:server_container": "docker container stop guess_artist_server_prod; docker container rm guess_artist_server_prod",
+    "build:server": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod build server",
+    "start:server:prod": "docker compose --file=prod.docker-compose.yml --env-file=.env.prod up -d server"
+  }
+}

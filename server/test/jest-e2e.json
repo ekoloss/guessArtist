@@ -1,0 +1,35 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@app/account/(.*)": "<rootDir>/../libs/account/src/$1",
+    "@app/account": "<rootDir>/../libs/account/src",
+    "@app/utils/(.*)": "<rootDir>/../libs/utils/src/$1",
+    "@app/utils": "<rootDir>/../libs/utils/src",
+    "@app/orm/(.*)": "<rootDir>/../libs/orm/src/$1",
+    "@app/orm": "<rootDir>/../libs/orm/src",
+    "@app/auth/(.*)": "<rootDir>/../libs/auth/src/$1",
+    "@app/auth": "<rootDir>/../libs/auth/src",
+    "@app/test-env/(.*)": "<rootDir>/../libs/test-env/src/$1",
+    "@app/test-env": "<rootDir>/../libs/test-env/src",
+    "@app/logger/(.*)": "<rootDir>/../libs/logger/src/$1",
+    "@app/logger": "<rootDir>/../libs/logger/src",
+    "@app/artist/(.*)": "<rootDir>/../libs/artist/src/$1",
+    "@app/artist": "<rootDir>/../libs/artist/src",
+    "@app/user/(.*)": "<rootDir>/../libs/user/src/$1",
+    "@app/user": "<rootDir>/../libs/user/src",
+    "@app/album/(.*)": "<rootDir>/../libs/album/src/$1",
+    "@app/album": "<rootDir>/../libs/album/src",
+    "@app/game/(.*)": "<rootDir>/../libs/game/src/$1",
+    "@app/game": "<rootDir>/../libs/game/src"
+  }
+}
