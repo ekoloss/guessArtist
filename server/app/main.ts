@@ -11,7 +11,6 @@ async function bootstrap() {
   const artistService = app.get(ArtistService);
   const albumService = app.get(AlbumService);
 
-  //@TODO load data on start dont works correctly
   await artistService.prepareArtists();
   await albumService.loadAlbums();
   app.enableCors();

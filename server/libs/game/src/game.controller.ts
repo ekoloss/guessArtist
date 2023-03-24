@@ -10,7 +10,7 @@ import {
 } from '@models';
 
 @Controller(`${apiPrefix}/game`)
-export class AccountController {
+export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Get(':gameId')
@@ -20,10 +20,10 @@ export class AccountController {
     return this.gameService.getQuestion(param);
   }
 
-  @Put(':id/check')
+  @Put(':gameId/check')
   check(
     @Param(gameValidation.check.param) param: IGameGetQuestionParams,
-    @Body(gameValidation.check.param) body: IGameCheckBody,
+    @Body(gameValidation.check.body) body: IGameCheckBody,
   ): Promise<IGameCheckResponse> {
     return this.gameService.checkResult(param, body);
   }

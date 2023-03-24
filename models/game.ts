@@ -15,4 +15,5 @@ export interface IGameCheckResponse {
 }
 export interface IGameAlbumResponse {
   album: string;
+  albumId: string;
 }

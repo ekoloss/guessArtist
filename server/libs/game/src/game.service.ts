@@ -48,6 +48,7 @@ export class GameService {
     if (parsedPayload.status !== gameStatus.in_progress) {
       throw new NotFoundException();
     }
+    //@TODO fix loading empty alboum
     const nextAlbum = parsedPayload.albums.pop();
     await this.redis.set(gameId, JSON.stringify(parsedPayload));
     await this.albumService.updateStatistic({
@@ -56,6 +57,7 @@ export class GameService {
     });
 
     return {
+      albumId: nextAlbum.id,
       album: nextAlbum.name,
     };
   }

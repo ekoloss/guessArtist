@@ -1,9 +1,9 @@
 export const enTranslation = {
-  auth: {
-    authorizeBtn: 'Log in',
-    authorizationLabel: 'Authorization',
-    loginError: 'This login/password combination is invalid',
-    login: 'login',
-    password: 'password',
+  game: {
+    gameLabel: 'Guess artist',
+    wrong: 'Sorry, but it was incorrect! Try again',
+    error: 'Oups, something went wrong!',
+    artist: 'Artist Name',
+    submit: 'Submit',
   }
 };
