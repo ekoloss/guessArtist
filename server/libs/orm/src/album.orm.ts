@@ -7,6 +7,7 @@ export class AlbumOrm extends BaseModel implements IAlbumModel {
   readonly artistId!: string;
   readonly showed!: number;
   readonly guessed!: number;
+  readonly artistName?: string;
 
   static get jsonSchema() {
     return {
@@ -17,6 +18,7 @@ export class AlbumOrm extends BaseModel implements IAlbumModel {
         artistId: { type: 'string' },
         showed: { type: 'number' },
         guessed: { type: 'number' },
+        artistName: { type: 'string' },
       },
     };
   }

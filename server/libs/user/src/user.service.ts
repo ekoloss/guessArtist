@@ -19,7 +19,7 @@ export class UserService {
 
   async submitResult(
     { gameId }: IGameGetQuestionParams,
-    { name, score }: IUserCreateBody,
+    { name }: IUserCreateBody,
   ): Promise<IUserResponse> {
     const gameData = await this.redis.get(gameId);
     const gamePayload = JSON.parse(gameData);
@@ -27,17 +27,35 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    const user = UserOrm.query().findOne({ name });
+    const user = await UserOrm.query().findOne({ name });
     if (!user) {
       return UserOrm.query().insertAndFetch({
         name,
-        score,
+        score: winPoints,
       });
     }
-    return UserOrm.query().findOne({ name }).increment('score', winPoints);
+    await UserOrm.query().findById(user.id).increment('score', winPoints);
+    return user;
   }
 
   async getTopRated(): Promise<IUserResponse[]> {
     return UserOrm.query().orderBy('score', 'desc').limit(3);
+  }
+
+  async exportCSV(
+    data: IUserResponse[],
+    stream: {
+      write: (arg: Record<string, string | number>) => void;
+      end: () => void;
+    },
+  ): Promise<void> {
+    data.map((item, index) => {
+      stream.write({
+        id: index + 1,
+        name: item.name,
+        score: item.score,
+      });
+    });
+    stream.end();
   }
 }

@@ -6,4 +6,6 @@ export interface IAlbumModel {
   guessed: number;
 }
 
-export interface IAlbumCreateBody extends Omit<IAlbumModel, 'id'> {}
+export interface IAlbumModelWithArtist extends IAlbumModel {
+  artistName?: string;
+}

@@ -7,7 +7,7 @@ import {
 } from 'node-itunes-search';
 import * as _ from 'lodash';
 import { AlbumOrm } from '@app/orm';
-import { IAlbumModel, IArtistGetById } from '@models';
+import { IAlbumModel, IArtistGetById, IAlbumModelWithArtist } from '@models';
 
 interface IAlbumUpdateStatistics {
   id: string;
@@ -59,5 +59,42 @@ export class AlbumService {
 
   async updateStatistic({ id, column }: IAlbumUpdateStatistics): Promise<void> {
     await AlbumOrm.query().findById(id).increment(column, 1);
+  }
+
+  async getAlbumListWithArtists(): Promise<IAlbumModelWithArtist[]> {
+    return AlbumOrm.query()
+      .join('artist', `artist.id`, '=', 'album.artistId')
+      .orderBy('showed', 'desc')
+      .select(
+        'album.id',
+        'album.name',
+        'album.showed',
+        'album.guessed',
+        'album.artistId',
+        'artist.name as artistName',
+      );
+  }
+
+  async exportCSV(
+    albums: IAlbumModelWithArtist[],
+    stream: {
+      write: (arg: Record<string, string | number>) => void;
+      end: () => void;
+    },
+  ): Promise<void> {
+    albums.map((item, index) => {
+      stream.write({
+        id: index + 1,
+        albumName: item.name,
+        artistName: item.artistName,
+        showed: item.showed,
+        guessed: item.guessed,
+      });
+    });
+    stream.end();
+  }
+
+  async removeAlbums(): Promise<void> {
+    await AlbumOrm.query().whereNot('id', null).delete();
   }
 }

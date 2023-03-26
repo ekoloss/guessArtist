@@ -8,8 +8,7 @@ export const userValidation = {
   submitResult: {
     body: new ValidatorPipe<IUserCreateBody>(
       Joi.object<IUserCreateBody>({
-        name: Joi.string().min(3),
-        score: Joi.number().default(0),
+        name: Joi.string().min(1),
       }),
     ),
     param: new ValidatorPipe<IGameGetQuestionParams>(

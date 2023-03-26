@@ -1,18 +1,28 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {MDBBtn, MDBCol, MDBContainer, MDBInput, MDBRow} from 'mdb-react-ui-kit';
-import { Form } from 'react-final-form';
+import {MDBBtn, MDBCol, MDBContainer, MDBRow} from 'mdb-react-ui-kit';
+import {Field, Form } from 'react-final-form';
+// @ts-ignore
+import ReactModal from 'react-modal';
 
-import {checkResult, getQuestion} from '../api';
-import {IGameAlbumResponse, IGameCheckBody, IGameGetQuestionParams} from "@models";
+import {checkResult, getQuestion, submitResult} from '../api';
+import {IGameAlbumResponse, IGameCheckBody, IGameGetQuestionParams, IUserCreateBody} from "@models";
 import {notificationManager} from '../components/notificationManager';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<IGameAlbumResponse>();
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { gameId } = useParams<'gameId'>();
   const { t } = useTranslation();
+
+  ReactModal.setAppElement('#root');
+
+  const defaultData: IGameCheckBody = {
+    answer: "",
+    albumId: "",
+  };
 
   useEffect(() => {
     if(!gameId){
@@ -29,20 +39,20 @@ const Game: React.FC = () => {
       setQuestion(data);
     } catch (e) {
       notificationManager.pushError([t('game.error')]);
+      return navigate('/', { replace: true });
     }
   }, [gameId]);
 
   const checkUserAnswer = useCallback(
     async (data: IGameCheckBody) => {
       try {
-        console.log(question?.albumId)
-        console.log(gameId)
-        console.log(data)
-        if(!gameId || !question?.albumId){
-          return;
-          // return navigate('/', { replace: true });
+        if(!gameId){
+          return navigate('/', { replace: true });
         }
-        const result = await checkResult( gameId, {...data, albumId: question.albumId});
+        if(!data.answer){
+          return;
+        }
+        const result = await checkResult( gameId, data);
         if(result.status === 'loose'){
           notificationManager.pushError([t('game.wrong')]);
           return navigate('/', { replace: true });
@@ -53,17 +63,33 @@ const Game: React.FC = () => {
         }
         if(result.status === 'win'){
           notificationManager.pushSuccess([t('game.correct')]);
-          // return navigate(`/${gameId}`, { replace: true }); @TODO navigate to stats page (get UserName)
+          setShowModal(true);
         }
       } catch (error) {
         console.log(error)
-        notificationManager.pushError([t('auth.loginError')]);
+        notificationManager.pushError([t('game.error')]);
+        return navigate('/', { replace: true });
       }
     },
     [navigate, t],
   );
 
-  console.log(question)
+  const setUserName = useCallback(
+    async (data: IUserCreateBody) => {
+      try {
+        if(!gameId){
+          return navigate('/', { replace: true });
+        }
+        await submitResult(gameId, data);
+        setShowModal(false);
+        return navigate('/top', { replace: true });
+      } catch (e) {
+        notificationManager.pushError([t('game.error')]);
+        return navigate('/', { replace: true });
+      }
+    },
+    [navigate, t]
+  );
   return (
     <MDBContainer>
       <MDBRow>
@@ -77,18 +103,20 @@ const Game: React.FC = () => {
         </MDBCol>
       </MDBRow>
       <MDBRow>
-        <MDBCol md='12' lg='12' className="mb-4">
-          <Form onSubmit={(val) => checkUserAnswer( val as IGameCheckBody)}>
+        <MDBCol md='12' lg='12' className="mb-4 text-center">
+          <Form onSubmit={(val) => checkUserAnswer(val as IGameCheckBody)}>
             {({ handleSubmit, submitting }) => (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} id="quizAnswer">
                 <MDBRow>
                   <MDBCol md='12' className="mb-4">
-                      <MDBInput
-                        name="answer"
-                        type='text'
-                        label={t('game.artist')}
-                        defaultValue="123"
-                      />
+                    <Field
+                      name='answer'
+                      component='input'
+                      defaultValue={defaultData.answer}
+                      placeholder={t('game.artist')}
+                      validate={value => (value ? undefined : "Required")}
+                    />
+                    <Field name='albumId' component='input' defaultValue={question?.albumId} type='hidden'/>
                     </MDBCol>
                  </MDBRow>
                 <MDBRow>
@@ -103,41 +131,42 @@ const Game: React.FC = () => {
           </Form>
         </MDBCol>
       </MDBRow>
+      <ReactModal
+        isOpen={showModal}
+        contentLabel="Winner!"
+        style={{
+          overlay: {
+            backgroundColor: 'lightgreen',
+          },
+          content: {
+            color: 'green',
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+            width: '300px',
+            textAlign: 'center',
+          },
+        }}
+      >
+        <p>You are winner!</p>
+        <p>Please enter your name</p>
+        <Form onSubmit={(val) => setUserName(val as IUserCreateBody)}>
+          {({ handleSubmit, submitting }) => (
+            <form onSubmit={handleSubmit} id="record">
+              <MDBRow>
+                <MDBCol md='12' className="mb-4">
+                  <Field name='name' component='input' defaultValue={defaultData.answer} placeholder={t('game.username')}/>
+                </MDBCol>
+              </MDBRow>
 
-      {/*<Form onSubmit={(val) => sendUserData(val as ILoginBody)}>*/}
-      {/*  {({ handleSubmit, submitting }) => (*/}
-      {/*    <form onSubmit={handleSubmit}>*/}
-      {/*      <MDBRow>*/}
-      {/*        <MDBCol md='12' className="mb-4">*/}
-      {/*          <MDBInput*/}
-      {/*            name="login"*/}
-      {/*            label={t('auth.login')}*/}
-      {/*            value={defaultAccountData.login}*/}
-      {/*          />*/}
-      {/*        </MDBCol>*/}
-      {/*      </MDBRow>*/}
-
-      {/*      <MDBRow>*/}
-      {/*        <MDBCol md='12' className="mb-4">*/}
-      {/*          <MDBInput*/}
-      {/*            name="password"*/}
-      {/*            type="password"*/}
-      {/*            label={t('auth.password')}*/}
-      {/*            value={defaultAccountData.password}*/}
-      {/*          />*/}
-      {/*        </MDBCol>*/}
-      {/*      </MDBRow>*/}
-
-            {/*<MDBRow>*/}
-            {/*  <MDBCol md='12'>*/}
-            {/*    <MDBBtn type="submit" className="xl">*/}
-            {/*      {t('auth.authorizeBtn')}*/}
-            {/*    </MDBBtn>*/}
-            {/*  </MDBCol>*/}
-            {/*</MDBRow>*/}
-      {/*    </form>*/}
-      {/*  )}*/}
-      {/*</Form>*/}
+              <MDBBtn type="submit" className="xl">Submit</MDBBtn>
+            </form>
+          )}
+        </Form>
+      </ReactModal>
     </MDBContainer>
   );
 };
