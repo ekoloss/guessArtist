@@ -1,4 +1,6 @@
 <b>Technical Interview - Backend oriented (short)</b></br>
+<b>Developer notes added</b></br>
+
 You are required to create a Web application that implements the following game: Guess the artist
 The game has 5 rounds.</br></br>
 Part 1:</br>
