@@ -14,6 +14,7 @@ the user name should be unique in the DB so users can play again and improve the
 Part 2: Enrichments -</br>
 We would like to save albums of the 10 predefined artists in the DB so we don't have to query the iTunes API every time a new game starts.</br>
 After a user finishes a game, calculate a list of top 3 players (you can assume there is only one process running)</br>
+<b><i>This part wasn clear: so i suggested exporting top 3 players to file. Also we grab statistics on showed/guessed albums and this statistics can be exported too</i></b></br>
 We would like to track the enrichments above and write them to a file.
 
 “New albums available” after finishing the album enrichment The list of the top 3 players
@@ -24,4 +25,6 @@ Technical specs:
 3. The website must have a basic design.
 4. Please note code structure best practices
    For any additional specification’s questions, please use common sense and continue.
-   
+
+<b><i>On the front part we use just useState to store data. Its not good option but in case of this task this was better option while saved time. It alse can be stored using context or redux.</br>
+Project is designed to work inside docker containers</i></b>
